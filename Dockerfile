@@ -20,16 +20,18 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Create config directory with proper permissions
-RUN mkdir -p /app/config && chmod 777 /app/config
-
 # Copy the rest of the application
 COPY . .
 
+# Create config directory and ensure proper permissions
+RUN mkdir -p /app/config && \
+    touch /app/config/config.json && \
+    chmod -R 777 /app/config && \
+    chmod 666 /app/config/config.json
+
 # Create a non-root user and switch to it
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
-    chown -R appuser:appuser /app && \
-    chmod -R 777 /app/config
+    chown -R appuser:appuser /app
 
 USER appuser
 
