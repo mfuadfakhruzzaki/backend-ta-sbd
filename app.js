@@ -8,6 +8,7 @@ const { sequelize } = require("./config/database");
 const { errorHandler } = require("./middleware/errorHandler");
 const { authLimiter, apiLimiter } = require("./middleware/rateLimiter");
 const corsMiddleware = require("./middleware/cors");
+const rateLimit = require("express-rate-limit");
 
 // Import routes
 const userRoute = require("./routes/userRoute");
@@ -22,6 +23,9 @@ const laporanRoute = require("./routes/laporanRoute");
 
 // Initialize Express app
 const app = express();
+
+// Trust proxy for rate limiter
+app.set("trust proxy", 1);
 
 // Security middleware
 app.use(helmet());

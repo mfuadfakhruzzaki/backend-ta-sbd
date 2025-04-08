@@ -37,6 +37,10 @@ EOF
 echo "Running database migrations..."
 npx sequelize-cli db:migrate --config /tmp/config/config.json --migrations-path /app/migrations
 
+# Run seeders
+echo "Running database seeders..."
+npx sequelize-cli db:seed:all --config /tmp/config/config.json --seeders-path /app/seeders
+
 # Start the application
 echo "Starting the application..."
 exec node app.js 
