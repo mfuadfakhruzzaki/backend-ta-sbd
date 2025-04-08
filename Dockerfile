@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     curl \
     netcat-openbsd \
-    mysql-client \
+    default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json before other files
