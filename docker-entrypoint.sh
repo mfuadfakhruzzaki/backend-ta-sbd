@@ -1,13 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 # docker-entrypoint.sh
 
 set -e
 
-# Wait for MySQL to be ready
+echo "Waiting for MySQL to be ready..."
 ./wait-for-it.sh db:3306 -- echo "MySQL is up"
 
-# Run database migrations
+echo "Running database migrations..."
 npx sequelize-cli db:migrate
 
-# Start the application
+echo "Starting the application..."
 exec npm start 

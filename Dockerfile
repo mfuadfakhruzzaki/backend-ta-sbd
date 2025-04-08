@@ -22,13 +22,14 @@ RUN npm install
 # Copy all files
 COPY . .
 
-# Make scripts executable
-RUN chmod +x ./wait-for-it.sh
-RUN chmod +x ./docker-entrypoint.sh
-
 # Create a non-root user and switch to it
 RUN groupadd -r appuser && useradd -r -g appuser appuser
-RUN chown -R appuser:appuser /app
+
+# Set proper permissions for scripts
+RUN chown -R appuser:appuser /app && \
+    chmod +x /app/wait-for-it.sh && \
+    chmod +x /app/docker-entrypoint.sh
+
 USER appuser
 
 # Expose the port the app runs on
@@ -39,4 +40,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
 # Command to run the entrypoint script
-ENTRYPOINT ["./docker-entrypoint.sh"] 
+ENTRYPOINT ["/app/docker-entrypoint.sh"] 
