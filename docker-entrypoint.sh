@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 # docker-entrypoint.sh
 
+# Exit on error
 set -e
 
 # Wait for MySQL to be ready

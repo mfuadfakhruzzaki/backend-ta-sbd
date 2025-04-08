@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     curl \
     netcat-openbsd \
+    mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json before other files
@@ -18,11 +19,6 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm install
-
-# Copy scripts first and set permissions
-COPY wait-for-it.sh /app/wait-for-it.sh
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod 755 /app/wait-for-it.sh /app/docker-entrypoint.sh
 
 # Copy the rest of the application
 COPY . .
@@ -40,5 +36,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-# Command to run the entrypoint script
-CMD ["/app/docker-entrypoint.sh"] 
+# Set the entrypoint to use bash
+ENTRYPOINT ["/bin/bash", "/app/docker-entrypoint.sh"] 
