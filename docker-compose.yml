@@ -44,7 +44,7 @@ services:
     container_name: marketplace-db
     restart: always
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
       - MYSQL_DATABASE=marketplace
