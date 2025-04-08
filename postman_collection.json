@@ -1,0 +1,2531 @@
+{
+  "info": {
+    "_postman_id": "67ec168f-0017-7496-6f85",
+    "name": "Marketplace API",
+    "description": "API Collection for Marketplace Application with comprehensive test cases and documentation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Endpoints for user authentication and authorization",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\",\n    \"nomor_telepon\": \"081234567890\",\n    \"alamat\": \"Jl. Example No. 123\",\n    \"kampus\": \"Universitas Example\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "register"]
+            },
+            "description": "Register a new user with required information"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has user data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('email');",
+                  "    pm.expect(jsonData.data).to.have.property('nama');",
+                  "    pm.expect(jsonData.data).to.not.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "login"]
+            },
+            "description": "Login user and get JWT token for authentication"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has token', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.data.token);",
+                  "});",
+                  "",
+                  "pm.test('Token is valid', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var token = jsonData.data.token;",
+                  "    var decoded = jwt.decode(token);",
+                  "    pm.expect(decoded).to.have.property('id');",
+                  "    pm.expect(decoded).to.have.property('email');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "Endpoints for user profile management",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Get current user profile information"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has user data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('email');",
+                  "    pm.expect(jsonData.data).to.have.property('nama');",
+                  "    pm.expect(jsonData.data).to.have.property('nomor_telepon');",
+                  "    pm.expect(jsonData.data).to.have.property('alamat');",
+                  "    pm.expect(jsonData.data).to.have.property('kampus');",
+                  "    pm.expect(jsonData.data).to.not.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama\": \"John Doe Updated\",\n    \"nomor_telepon\": \"081234567891\",\n    \"alamat\": \"Jl. Example No. 124\",\n    \"kampus\": \"Universitas Example Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Update current user profile information"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.nama).to.equal('John Doe Updated');",
+                  "    pm.expect(jsonData.data.nomor_telepon).to.equal('081234567891');",
+                  "    pm.expect(jsonData.data.alamat).to.equal('Jl. Example No. 124');",
+                  "    pm.expect(jsonData.data.kampus).to.equal('Universitas Example Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"current_password\": \"password123\",\n    \"new_password\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "change-password"]
+            },
+            "description": "Change user password with current password verification"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal('Password updated successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Profile Picture",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "foto_profil",
+                  "type": "file",
+                  "src": "/path/to/profile.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/update-profile-picture",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "update-profile-picture"]
+            },
+            "description": "Update user profile picture with file upload"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated profile picture URL', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('foto_profil');",
+                  "    pm.expect(jsonData.data.foto_profil).to.include('http');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete User Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Delete current user account and all associated data"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal('User account deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "description": "Endpoints for category management",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/kategori",
+              "host": ["{{base_url}}"],
+              "path": ["api", "kategori"]
+            },
+            "description": "Get all available product categories"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has categories data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/kategori/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "kategori", "1"]
+            },
+            "description": "Get a specific category by ID"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has category data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('kategori_id');",
+                  "    pm.expect(jsonData.data).to.have.property('nama_kategori');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama_kategori\": \"Elektronik\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/kategori",
+              "host": ["{{base_url}}"],
+              "path": ["api", "kategori"]
+            },
+            "description": "Create a new product category (admin only)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has category data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('kategori_id');",
+                  "    pm.expect(jsonData.data).to.have.property('nama_kategori');",
+                  "    pm.expect(jsonData.data.nama_kategori).to.equal('Elektronik');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama_kategori\": \"Elektronik Update\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/kategori/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "kategori", "1"]
+            },
+            "description": "Update an existing category (admin only)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated category data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('kategori_id');",
+                  "    pm.expect(jsonData.data).to.have.property('nama_kategori');",
+                  "    pm.expect(jsonData.data.nama_kategori).to.equal('Elektronik Update');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kategori/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "kategori", "1"]
+            },
+            "description": "Delete a category (admin only)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "description": "Endpoints for product management",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/barang",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang"],
+              "query": [
+                {
+                  "key": "kategori_id",
+                  "value": "",
+                  "description": "Filter by category ID",
+                  "disabled": true
+                },
+                {
+                  "key": "harga_min",
+                  "value": "",
+                  "description": "Minimum price",
+                  "disabled": true
+                },
+                {
+                  "key": "harga_max",
+                  "value": "",
+                  "description": "Maximum price",
+                  "disabled": true
+                },
+                {
+                  "key": "kondisi",
+                  "value": "",
+                  "description": "Product condition",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "description": "Search keyword",
+                  "disabled": true
+                },
+                {
+                  "key": "lokasi",
+                  "value": "",
+                  "description": "Location",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "newest",
+                  "description": "Sort option: newest, oldest, price_low, price_high",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all products with optional filtering and sorting"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has products data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response has count property', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('count');",
+                  "    pm.expect(jsonData.count).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/barang/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang", "1"]
+            },
+            "description": "Get a specific product by ID"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has product data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('barang_id');",
+                  "    pm.expect(jsonData.data).to.have.property('judul');",
+                  "    pm.expect(jsonData.data).to.have.property('deskripsi');",
+                  "    pm.expect(jsonData.data).to.have.property('harga');",
+                  "    pm.expect(jsonData.data).to.have.property('foto');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Products by User ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/barang/user/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang", "user", "1"]
+            },
+            "description": "Get all products from a specific user"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has products data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/barang/search?keyword=laptop",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "laptop",
+                  "description": "Search keyword"
+                },
+                {
+                  "key": "kategori_id",
+                  "value": "",
+                  "description": "Filter by category ID",
+                  "disabled": true
+                },
+                {
+                  "key": "harga_min",
+                  "value": "",
+                  "description": "Minimum price",
+                  "disabled": true
+                },
+                {
+                  "key": "harga_max",
+                  "value": "",
+                  "description": "Maximum price",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Search and filter products"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has products data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "judul",
+                  "value": "Laptop Bekas Lenovo ThinkPad X1",
+                  "type": "text",
+                  "description": "Product title"
+                },
+                {
+                  "key": "deskripsi",
+                  "value": "Laptop bekas kondisi masih bagus, jarang dipakai. Spesifikasi: Intel Core i7, RAM 16GB, SSD 512GB.",
+                  "type": "text",
+                  "description": "Product description"
+                },
+                {
+                  "key": "harga",
+                  "value": "8500000",
+                  "type": "text",
+                  "description": "Product price"
+                },
+                {
+                  "key": "kategori_id",
+                  "value": "1",
+                  "type": "text",
+                  "description": "Category ID"
+                },
+                {
+                  "key": "lokasi",
+                  "value": "Jakarta Selatan",
+                  "type": "text",
+                  "description": "Location"
+                },
+                {
+                  "key": "kondisi",
+                  "value": "bekas",
+                  "type": "text",
+                  "description": "Product condition"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": "/path/to/laptop1.jpg",
+                  "description": "Product image"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": "/path/to/laptop2.jpg",
+                  "description": "Product image (additional)",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/barang",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang"]
+            },
+            "description": "Create a new product with image upload (supports multiple images)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has product data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('barang_id');",
+                  "    pm.expect(jsonData.data).to.have.property('judul');",
+                  "    pm.expect(jsonData.data).to.have.property('foto');",
+                  "    pm.expect(jsonData.data.foto).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Product was created with correct data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.judul).to.equal('Laptop Bekas Lenovo ThinkPad X1');",
+                  "    pm.expect(jsonData.data.harga).to.equal(8500000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "judul",
+                  "value": "Laptop Bekas Lenovo ThinkPad X1 Carbon",
+                  "type": "text",
+                  "description": "Updated product title"
+                },
+                {
+                  "key": "deskripsi",
+                  "value": "Laptop bekas kondisi masih bagus, jarang dipakai. Spesifikasi: Intel Core i7 gen 10, RAM 16GB, SSD 512GB, Layar 14 inch.",
+                  "type": "text",
+                  "description": "Updated product description"
+                },
+                {
+                  "key": "harga",
+                  "value": "9000000",
+                  "type": "text",
+                  "description": "Updated product price"
+                },
+                {
+                  "key": "kategori_id",
+                  "value": "1",
+                  "type": "text",
+                  "description": "Category ID"
+                },
+                {
+                  "key": "lokasi",
+                  "value": "Jakarta Selatan",
+                  "type": "text",
+                  "description": "Location"
+                },
+                {
+                  "key": "kondisi",
+                  "value": "bekas",
+                  "type": "text",
+                  "description": "Product condition"
+                },
+                {
+                  "key": "status",
+                  "value": "tersedia",
+                  "type": "text",
+                  "description": "Product status"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": "/path/to/updated_laptop.jpg",
+                  "description": "New product image",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/barang/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang", "1"]
+            },
+            "description": "Update an existing product"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated product data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('barang_id');",
+                  "    pm.expect(jsonData.data).to.have.property('judul');",
+                  "});",
+                  "",
+                  "pm.test('Product was updated with correct data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.judul).to.include('ThinkPad X1 Carbon');",
+                  "    pm.expect(jsonData.data.harga).to.equal(9000000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Product (Soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/barang/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang", "1"]
+            },
+            "description": "Soft delete a product (sets status_delete to 1)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Product (Hard)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/barang/1/hard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "barang", "1", "hard"]
+            },
+            "description": "Hard delete a product (admin only)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "description": "Endpoints for transaction management",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/transaksi",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi"]
+            },
+            "description": "Get all transactions (requires authentication)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has transactions data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"barang_id\": 1,\n    \"jumlah\": 1,\n    \"metode_pembayaran\": \"transfer\",\n    \"alamat_pengiriman\": \"Jl. Example No. 123, Jakarta Selatan\",\n    \"catatan\": \"Tolong dibungkus dengan aman\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/transaksi",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi"]
+            },
+            "description": "Create a new transaction for purchasing a product"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has transaction data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('transaksi_id');",
+                  "    pm.expect(jsonData.data).to.have.property('barang_id');",
+                  "    pm.expect(jsonData.data).to.have.property('pembeli_id');",
+                  "    pm.expect(jsonData.data).to.have.property('penjual_id');",
+                  "    pm.expect(jsonData.data).to.have.property('status');",
+                  "    pm.expect(jsonData.data).to.have.property('total_harga');",
+                  "});",
+                  "",
+                  "pm.test('Transaction status is pending by default', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.status).to.equal('pending');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/transaksi/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi", "1"]
+            },
+            "description": "Get transaction details by ID"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has transaction data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('transaksi_id');",
+                  "    pm.expect(jsonData.data).to.have.property('barang');",
+                  "    pm.expect(jsonData.data).to.have.property('pembeli');",
+                  "    pm.expect(jsonData.data).to.have.property('penjual');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Transaction Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"processing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/transaksi/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi", "1", "status"]
+            },
+            "description": "Update the status of a transaction (pending, processing, shipped, completed, cancelled)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Transaction status updated successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('status');",
+                  "    pm.expect(jsonData.data.status).to.equal('processing');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Transactions as Buyer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/transaksi/as-buyer",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi", "as-buyer"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "completed",
+                  "description": "Filter by transaction status",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all transactions where current user is the buyer"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has transactions data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Transactions as Seller",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/transaksi/as-seller",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi", "as-seller"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Filter by transaction status",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all transactions where current user is the seller"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has transactions data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/transaksi/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transaksi", "history"]
+            },
+            "description": "Get all completed transactions for the current user"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has history data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wishlist",
+      "description": "Endpoints for wishlist management",
+      "item": [
+        {
+          "name": "Get User's Wishlist",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wishlist",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wishlist"]
+            },
+            "description": "Get all items in the user's wishlist"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has wishlist data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add to Wishlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"barang_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wishlist",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wishlist"]
+            },
+            "description": "Add a product to user's wishlist"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has wishlist data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('wishlist_id');",
+                  "    pm.expect(jsonData.data).to.have.property('barang_id');",
+                  "    pm.expect(jsonData.data).to.have.property('user_id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Wishlist Item",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wishlist/check/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wishlist", "check", "1"]
+            },
+            "description": "Check if a product is in the user's wishlist"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has exists property', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('exists');",
+                  "    pm.expect(jsonData.data.exists).to.be.a('boolean');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove from Wishlist",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wishlist/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wishlist", "1"]
+            },
+            "description": "Remove a product from user's wishlist"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ratings",
+      "description": "Endpoints for rating management",
+      "item": [
+        {
+          "name": "Get User Ratings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/rating/user/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rating", "user", "1"]
+            },
+            "description": "Get all ratings for a specific user"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has ratings data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Rating by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/rating/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rating", "1"]
+            },
+            "description": "Get a specific rating by ID"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has rating data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('rating_id');",
+                  "    pm.expect(jsonData.data).to.have.property('transaksi_id');",
+                  "    pm.expect(jsonData.data).to.have.property('user_id');",
+                  "    pm.expect(jsonData.data).to.have.property('nilai');",
+                  "    pm.expect(jsonData.data).to.have.property('komentar');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Rating by Transaction ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/rating/transaksi/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rating", "transaksi", "1"]
+            },
+            "description": "Get rating associated with a specific transaction"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has rating data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('rating_id');",
+                  "    pm.expect(jsonData.data).to.have.property('transaksi_id');",
+                  "    pm.expect(jsonData.data.transaksi_id).to.equal(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"transaksi_id\": 1,\n    \"nilai\": 5,\n    \"komentar\": \"Produk sangat bagus dan sesuai deskripsi. Penjual ramah dan pengiriman cepat.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rating",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rating"]
+            },
+            "description": "Create a new rating for a completed transaction"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has rating data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('rating_id');",
+                  "    pm.expect(jsonData.data).to.have.property('transaksi_id');",
+                  "    pm.expect(jsonData.data).to.have.property('nilai');",
+                  "    pm.expect(jsonData.data).to.have.property('komentar');",
+                  "});",
+                  "",
+                  "pm.test('Rating value is correct', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.nilai).to.equal(5);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Examples",
+      "description": "Example workflows for testing the application",
+      "item": [
+        {
+          "name": "1. Admin Setup",
+          "description": "Setup steps for admin (create categories)",
+          "item": [
+            {
+              "name": "Login as Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                },
+                "description": "Login as admin user to get JWT token"
+              }
+            },
+            {
+              "name": "Create Elektronik Category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nama_kategori\": \"Elektronik\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/kategori",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "kategori"]
+                },
+                "description": "Create Electronics category"
+              }
+            },
+            {
+              "name": "Create Pakaian Category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nama_kategori\": \"Pakaian\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/kategori",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "kategori"]
+                },
+                "description": "Create Clothing category"
+              }
+            },
+            {
+              "name": "Create Buku Category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nama_kategori\": \"Buku\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/kategori",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "kategori"]
+                },
+                "description": "Create Books category"
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. User Registration & Management",
+          "description": "User registration and profile management",
+          "item": [
+            {
+              "name": "Register Seller",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nama\": \"Budi Penjual\",\n    \"email\": \"seller@example.com\",\n    \"password\": \"password123\",\n    \"nomor_telepon\": \"081234567890\",\n    \"alamat\": \"Jl. Seller No. 123\",\n    \"kampus\": \"Universitas Penjual\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "register"]
+                },
+                "description": "Register a seller user"
+              }
+            },
+            {
+              "name": "Login as Seller",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"seller@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                },
+                "description": "Login as seller to get JWT token"
+              }
+            },
+            {
+              "name": "Update Seller Profile Picture",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "foto_profil",
+                      "type": "file",
+                      "src": "/path/to/profile.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/update-profile-picture",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "update-profile-picture"]
+                },
+                "description": "Update seller's profile picture"
+              }
+            },
+            {
+              "name": "Register Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nama\": \"Anton Pembeli\",\n    \"email\": \"buyer@example.com\",\n    \"password\": \"password123\",\n    \"nomor_telepon\": \"087654321098\",\n    \"alamat\": \"Jl. Buyer No. 321\",\n    \"kampus\": \"Universitas Pembeli\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "register"]
+                },
+                "description": "Register a buyer user"
+              }
+            },
+            {
+              "name": "Login as Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"buyer@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                },
+                "description": "Login as buyer to get JWT token"
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Product Management",
+          "description": "Create and manage products as seller",
+          "item": [
+            {
+              "name": "Login as Seller",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"seller@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                }
+              }
+            },
+            {
+              "name": "Create Laptop Product",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "judul",
+                      "value": "Laptop Bekas Lenovo ThinkPad X1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "deskripsi",
+                      "value": "Laptop bekas kondisi masih bagus, jarang dipakai. Spesifikasi: Intel Core i7, RAM 16GB, SSD 512GB.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "harga",
+                      "value": "8500000",
+                      "type": "text"
+                    },
+                    {
+                      "key": "kategori_id",
+                      "value": "1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "lokasi",
+                      "value": "Jakarta Selatan",
+                      "type": "text"
+                    },
+                    {
+                      "key": "kondisi",
+                      "value": "bekas",
+                      "type": "text"
+                    },
+                    {
+                      "key": "foto",
+                      "type": "file",
+                      "src": "/path/to/laptop1.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/barang",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "barang"]
+                }
+              }
+            },
+            {
+              "name": "Create Smartphone Product",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "judul",
+                      "value": "Smartphone Samsung Galaxy S20 Bekas",
+                      "type": "text"
+                    },
+                    {
+                      "key": "deskripsi",
+                      "value": "Samsung Galaxy S20 bekas kondisi 90%. RAM 8GB, Storage 128GB, warna Cosmic Gray.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "harga",
+                      "value": "5200000",
+                      "type": "text"
+                    },
+                    {
+                      "key": "kategori_id",
+                      "value": "1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "lokasi",
+                      "value": "Jakarta Selatan",
+                      "type": "text"
+                    },
+                    {
+                      "key": "kondisi",
+                      "value": "bekas",
+                      "type": "text"
+                    },
+                    {
+                      "key": "foto",
+                      "type": "file",
+                      "src": "/path/to/phone1.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/barang",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "barang"]
+                }
+              }
+            },
+            {
+              "name": "Create Book Product",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "judul",
+                      "value": "Buku Pemrograman Java Bekas",
+                      "type": "text"
+                    },
+                    {
+                      "key": "deskripsi",
+                      "value": "Buku Pemrograman Java untuk Pemula, kondisi bekas tapi masih bagus, tidak ada coretan.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "harga",
+                      "value": "125000",
+                      "type": "text"
+                    },
+                    {
+                      "key": "kategori_id",
+                      "value": "3",
+                      "type": "text"
+                    },
+                    {
+                      "key": "lokasi",
+                      "value": "Jakarta Barat",
+                      "type": "text"
+                    },
+                    {
+                      "key": "kondisi",
+                      "value": "bekas",
+                      "type": "text"
+                    },
+                    {
+                      "key": "foto",
+                      "type": "file",
+                      "src": "/path/to/book1.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/barang",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "barang"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Buyer Activities",
+          "description": "Activities performed by buyer user",
+          "item": [
+            {
+              "name": "Login as Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"buyer@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                }
+              }
+            },
+            {
+              "name": "Browse Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/barang?kategori_id=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "barang"],
+                  "query": [
+                    {
+                      "key": "kategori_id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Browse products in Electronics category"
+              }
+            },
+            {
+              "name": "Add Laptop to Wishlist",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"barang_id\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/wishlist",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "wishlist"]
+                }
+              }
+            },
+            {
+              "name": "Create Transaction for Laptop",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"barang_id\": 1,\n    \"jumlah\": 1,\n    \"metode_pembayaran\": \"transfer\",\n    \"alamat_pengiriman\": \"Jl. Buyer No. 321, Jakarta Timur\",\n    \"catatan\": \"Tolong dibungkus dengan aman\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/transaksi",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "transaksi"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Transaction Management",
+          "description": "Manage transaction process between seller and buyer",
+          "item": [
+            {
+              "name": "Login as Seller",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"seller@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                }
+              }
+            },
+            {
+              "name": "Get Transactions as Seller",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/transaksi/as-seller",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "transaksi", "as-seller"]
+                }
+              }
+            },
+            {
+              "name": "Update Transaction to Processing",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"processing\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/transaksi/1/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "transaksi", "1", "status"]
+                }
+              }
+            },
+            {
+              "name": "Update Transaction to Shipped",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"shipped\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/transaksi/1/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "transaksi", "1", "status"]
+                }
+              }
+            },
+            {
+              "name": "Login as Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"buyer@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                }
+              }
+            },
+            {
+              "name": "Get Transactions as Buyer",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/transaksi/as-buyer",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "transaksi", "as-buyer"]
+                }
+              }
+            },
+            {
+              "name": "Update Transaction to Completed",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/transaksi/1/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "transaksi", "1", "status"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Rating and Review",
+          "description": "Rate and review completed transactions",
+          "item": [
+            {
+              "name": "Login as Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"buyer@example.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "login"]
+                }
+              }
+            },
+            {
+              "name": "Create Rating for Transaction",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"transaksi_id\": 1,\n    \"nilai\": 5,\n    \"komentar\": \"Produk bagus sekali, sesuai dengan deskripsi. Pengiriman cepat dan penjual sangat ramah. Sangat memuaskan!\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/rating",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "rating"]
+                }
+              }
+            },
+            {
+              "name": "View Seller Ratings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/rating/user/2",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "rating", "user", "2"]
+                },
+                "description": "View ratings for the seller (assuming seller user ID is 2)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script to set environment variables",
+          "if (!pm.environment.get('base_url')) {",
+          "    pm.environment.set('base_url', 'http://localhost:3000');",
+          "}",
+          "",
+          "// Add timestamp to request headers",
+          "pm.request.headers.add({",
+          "    key: 'X-Request-Timestamp',",
+          "    value: new Date().toISOString()",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Test script to check response",
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test('Response has success property', function () {",
+          "    var jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "});",
+          "",
+          "// Store token from login response",
+          "if (pm.response.code === 200 && pm.request.url.toString().includes('login')) {",
+          "    var jsonData = pm.response.json();",
+          "    pm.environment.set('token', jsonData.data.token);",
+          "}",
+          "",
+          "// Log response time",
+          "pm.test('Response time is less than 200ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(200);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: marketplace-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=marketplace
+      - DB_PORT=3306
+      - JWT_SECRET=tugas_akhir_sbd_secret_key
+      - JWT_EXPIRES_IN=24h
+      - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT}
+      - APPWRITE_PROJECT_ID=${APPWRITE_PROJECT_ID}
+      - APPWRITE_API_KEY=${APPWRITE_API_KEY}
+      - APPWRITE_BUCKET_ID=${APPWRITE_BUCKET_ID}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: mysql:8.0
+    container_name: marketplace-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=marketplace
+    volumes:
+      - ./knowledge/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - mysql-data:/var/lib/mysql
+      - mysql-backup:/var/backup/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-proot_password",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.70"
+          memory: 1G
+        reservations:
+          cpus: "0.3"
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backup:
+    image: alpine:latest
+    container_name: marketplace-backup
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./docker/backup.sh:/backup.sh
+      - mysql-backup:/var/backup/mysql
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root_password
+      - MYSQL_DATABASE=marketplace
+    command: >
+      /bin/sh -c "
+        apk add --no-cache mysql-client
+        chmod +x /backup.sh
+        echo '0 2 * * * /backup.sh >> /var/backup/mysql/backup.log 2>&1' > /etc/crontabs/root
+        crond -f
+      "
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mysql-backup:
