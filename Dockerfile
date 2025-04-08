@@ -20,12 +20,16 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Create migrations directory
+RUN mkdir -p /app/migrations
+
 # Copy the rest of the application
 COPY . .
 
 # Create a non-root user and switch to it
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
-    chown -R appuser:appuser /app
+    chown -R appuser:appuser /app && \
+    chmod -R 755 /app/migrations
 
 USER appuser
 

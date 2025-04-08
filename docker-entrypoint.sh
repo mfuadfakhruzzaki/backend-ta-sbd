@@ -33,9 +33,9 @@ cat > /tmp/config/config.json << EOF
 }
 EOF
 
-# Run database migrations with custom config path
+# Run database migrations with custom config path and migrations path
 echo "Running database migrations..."
-npx sequelize-cli db:migrate --config /tmp/config/config.json
+npx sequelize-cli db:migrate --config /tmp/config/config.json --migrations-path /app/migrations
 
 # Start the application
 echo "Starting the application..."
