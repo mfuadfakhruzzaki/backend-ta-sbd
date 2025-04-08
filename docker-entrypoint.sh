@@ -39,4 +39,4 @@ npx sequelize-cli db:migrate --config /tmp/config/config.json --migrations-path 
 
 # Start the application
 echo "Starting the application..."
-exec node server.js 
+exec node app.js 
