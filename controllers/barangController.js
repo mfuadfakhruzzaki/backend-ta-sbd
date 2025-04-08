@@ -126,29 +126,59 @@ const createBarang = async (req, res, next) => {
     const { kategori_id, judul, deskripsi, harga, lokasi, kondisi } = req.body;
     const userId = req.user.id;
 
-    // Check if category exists
+    // Validasi input
+    if (!kategori_id || !judul || !deskripsi || !harga || !lokasi || !kondisi) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua field wajib diisi",
+      });
+    }
+
+    // Validasi kategori
     const category = await Kategori.findByPk(kategori_id);
     if (!category) {
-      throw new ApiError("Category not found", 404);
-    }
-
-    // Upload files if any
-    let fileUrls = [];
-    if (req.files && req.files.length > 0) {
-      const uploadPromises = req.files.map(async (file) => {
-        const result = await uploadFile(file.buffer, file.originalname);
-        return result.url;
+      return res.status(404).json({
+        status: "error",
+        message: "Kategori tidak ditemukan",
       });
-      fileUrls = await Promise.all(uploadPromises);
     }
 
-    // Create product
+    // Upload files jika ada
+    let fileUrls = [];
+
+    if (req.files && req.files.length > 0) {
+      console.log(`Memproses ${req.files.length} file untuk diupload`);
+
+      try {
+        // Upload files satu per satu
+        for (const file of req.files) {
+          try {
+            console.log(`Mengupload file: ${file.originalname}`);
+            const result = await uploadFile(file.buffer, file.originalname);
+            if (result && result.url) {
+              fileUrls.push(result.url);
+              console.log(`Berhasil upload file: ${result.url}`);
+            }
+          } catch (uploadError) {
+            console.error(
+              `Error uploading file ${file.originalname}:`,
+              uploadError
+            );
+            // Lanjutkan ke file berikutnya jika ada error
+          }
+        }
+      } catch (filesError) {
+        console.error("Error saat memproses files:", filesError);
+      }
+    }
+
+    // Buat produk baru
     const newProduct = await Barang.create({
       user_id: userId,
       kategori_id,
       judul,
       deskripsi,
-      foto_barang: fileUrls.join(","),
+      foto: fileUrls, // Array URL akan otomatis di-JSON.stringify oleh getter/setter di model
       harga,
       lokasi,
       kondisi,
@@ -157,7 +187,7 @@ const createBarang = async (req, res, next) => {
       status_delete: 0,
     });
 
-    // Fetch with associations
+    // Ambil data produk beserta relasi
     const productWithAssociations = await Barang.findByPk(
       newProduct.barang_id,
       {
@@ -176,14 +206,14 @@ const createBarang = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: "Product created successfully",
+      message: "Produk berhasil dibuat",
       data: productWithAssociations,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating product:", error);
     return res.status(500).json({
       status: "error",
-      message: error.message || "Internal server error",
+      message: error.message || "Terjadi kesalahan internal server",
     });
   }
 };

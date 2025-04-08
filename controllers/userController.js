@@ -310,8 +310,8 @@ const updateProfilePicture = async (req, res, next) => {
       throw new ApiError("User not found", 404);
     }
 
-    // Upload file to Appwrite
-    const { uploadToAppwrite } = require("../utils/fileUpload");
+    // Upload file to PocketBase
+    const { uploadFile } = require("../utils/fileUpload");
 
     // Handle both memory storage (req.file.buffer) and disk storage (req.file.path)
     let fileData;
@@ -329,10 +329,10 @@ const updateProfilePicture = async (req, res, next) => {
       throw new ApiError("Invalid file upload", 400);
     }
 
-    const result = await uploadToAppwrite(fileData, req.file.originalname);
+    const result = await uploadFile(fileData, req.file.originalname);
 
-    // Update profile picture with the URL from Appwrite
-    await user.update({ foto_profil: result.fileUrl });
+    // Update profile picture with the URL from PocketBase
+    await user.update({ foto_profil: result.url });
 
     res.status(200).json({
       success: true,

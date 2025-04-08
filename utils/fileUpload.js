@@ -1,12 +1,13 @@
 const multer = require("multer");
-const path = require("path");
-const pb = require("../config/pocketbase");
-const FormData = require("form-data");
+const {
+  uploadFileToPocketBase,
+  deleteFileFromPocketBase,
+} = require("../config/pocketbase");
 
-// Configure multer for memory storage
+// Konfigurasi multer untuk penyimpanan di memory
 const storage = multer.memoryStorage();
 
-// Configure file filter
+// Konfigurasi filter file untuk mengizinkan hanya gambar
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
   if (allowedTypes.includes(file.mimetype)) {
@@ -14,26 +15,26 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new Error(
-        "Invalid file type. Only JPEG, JPG, PNG and GIF image files are allowed."
+        "Tipe file tidak valid. Hanya file gambar JPEG, JPG, PNG dan GIF yang diizinkan."
       )
     );
   }
 };
 
-// Configure upload
+// Konfigurasi upload
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024, // Batas 5MB
   },
 });
 
 /**
- * Upload a file to PocketBase storage
- * @param {Buffer} fileBuffer - File buffer from multer
- * @param {String} filename - Original filename
- * @returns {Object} - File ID and URL
+ * Upload file ke PocketBase
+ * @param {Buffer} fileBuffer - Buffer file dari multer
+ * @param {String} filename - Nama file asli
+ * @returns {Object} - ID dan URL file
  */
 const uploadFile = async (fileBuffer, filename) => {
   try {
@@ -41,20 +42,12 @@ const uploadFile = async (fileBuffer, filename) => {
       `Uploading file: ${filename}, size: ${fileBuffer.length} bytes`
     );
 
-    // Create FormData and append file
-    const formData = new FormData();
-    const blob = new Blob([fileBuffer]);
-    formData.append("file", blob, filename);
-
-    // Upload to PocketBase 'images' collection
-    const record = await pb.collection("images").create(formData);
-
-    // Get file URL
-    const fileUrl = pb.files.getUrl(record, record.file);
+    // Upload file ke PocketBase menggunakan fungsi yang sudah diperbaiki
+    const result = await uploadFileToPocketBase(fileBuffer, filename);
 
     return {
-      id: record.id,
-      url: fileUrl,
+      id: result.id,
+      url: result.url,
     };
   } catch (error) {
     console.error("PocketBase upload error:", error);
@@ -63,14 +56,13 @@ const uploadFile = async (fileBuffer, filename) => {
 };
 
 /**
- * Delete a file from PocketBase storage
- * @param {String} fileId - File ID to delete
- * @returns {Boolean} - Success status
+ * Hapus file dari PocketBase
+ * @param {String} fileId - ID file yang akan dihapus
+ * @returns {Boolean} - Status keberhasilan
  */
 const deleteFile = async (fileId) => {
   try {
-    await pb.collection("images").delete(fileId);
-    return true;
+    return await deleteFileFromPocketBase(fileId);
   } catch (error) {
     console.error("PocketBase delete error:", error);
     return false;
