@@ -19,16 +19,17 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy all files
+# Copy scripts first and set permissions
+COPY wait-for-it.sh /app/wait-for-it.sh
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod 755 /app/wait-for-it.sh /app/docker-entrypoint.sh
+
+# Copy the rest of the application
 COPY . .
 
 # Create a non-root user and switch to it
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
-# Set proper permissions for scripts
-RUN chown -R appuser:appuser /app && \
-    chmod +x /app/wait-for-it.sh && \
-    chmod +x /app/docker-entrypoint.sh
+RUN groupadd -r appuser && useradd -r -g appuser appuser && \
+    chown -R appuser:appuser /app
 
 USER appuser
 
@@ -40,4 +41,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
 # Command to run the entrypoint script
-ENTRYPOINT ["/app/docker-entrypoint.sh"] 
+CMD ["/app/docker-entrypoint.sh"] 
