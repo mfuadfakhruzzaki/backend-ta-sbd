@@ -4,6 +4,10 @@
 # Exit on error
 set -e
 
+# Ensure config directory exists and has proper permissions
+mkdir -p /app/config
+chmod 777 /app/config
+
 # Wait for MySQL to be ready
 echo "Waiting for MySQL to be ready..."
 while ! mysqladmin ping -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" --silent; do
@@ -31,6 +35,9 @@ cat > /app/config/config.json << EOF
   }
 }
 EOF
+
+# Ensure config.json has proper permissions
+chmod 666 /app/config/config.json
 
 # Run database migrations
 echo "Running database migrations..."
