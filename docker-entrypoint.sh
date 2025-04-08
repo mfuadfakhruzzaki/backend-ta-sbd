@@ -10,8 +10,9 @@ while ! mysqladmin ping -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" --silent; do
     sleep 1
 done
 
-# Create config.json from environment variables
-cat > /app/config/config.json << EOF
+# Create config directory in /tmp where we have write access
+mkdir -p /tmp/config
+cat > /tmp/config/config.json << EOF
 {
   "development": {
     "username": "$DB_USER",
@@ -32,9 +33,9 @@ cat > /app/config/config.json << EOF
 }
 EOF
 
-# Run database migrations
+# Run database migrations with custom config path
 echo "Running database migrations..."
-npx sequelize-cli db:migrate
+npx sequelize-cli db:migrate --config /tmp/config/config.json
 
 # Start the application
 echo "Starting the application..."
