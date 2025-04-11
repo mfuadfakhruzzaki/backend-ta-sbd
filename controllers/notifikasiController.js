@@ -8,7 +8,7 @@ const getUserNotifications = async (req, res, next) => {
 
     const notifications = await Notifikasi.findAll({
       where: { user_id: userId },
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
 
     // Get unread count
