@@ -37,9 +37,17 @@ EOF
 echo "Running database migrations..."
 npx sequelize-cli db:migrate --config /tmp/config/config.json --migrations-path /app/migrations
 
-# Run seeders
-echo "Running database seeders..."
-npx sequelize-cli db:seed:all --config /tmp/config/config.json --seeders-path /app/seeders
+# Check if admin user exists before seeding
+echo "Checking if admin user exists..."
+ADMIN_EXISTS=$(mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" -e "SELECT COUNT(*) FROM USER WHERE role = 'admin'" -s)
+
+# Run seeders only if no admin user found
+if [ "$ADMIN_EXISTS" -eq "0" ]; then
+  echo "No admin user found. Running database seeders..."
+  npx sequelize-cli db:seed:all --config /tmp/config/config.json --seeders-path /app/seeders
+else
+  echo "Admin user already exists. Skipping seeders."
+fi
 
 # Start the application
 echo "Starting the application..."

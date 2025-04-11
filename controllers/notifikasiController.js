@@ -124,7 +124,7 @@ const deleteNotification = async (req, res, next) => {
 const createNotification = async (req, res, next) => {
   try {
     // Verify admin status
-    if (!req.user.is_admin) {
+    if (!req.user || req.user.role !== "admin") {
       throw new ApiError("Only admin can create notifications", 403);
     }
 
