@@ -12,12 +12,6 @@ router.get("/", transaksiController.getAllTransaksi);
 // Create a new transaction
 router.post("/", transaksiController.createTransaksi);
 
-// Get transaction by ID
-router.get("/:id", transaksiController.getTransaksiById);
-
-// Update transaction status
-router.patch("/:id/status", transaksiController.updateTransaksiStatus);
-
 // Get transactions as buyer
 router.get("/as-buyer", transaksiController.getTransaksiAsBuyer);
 
@@ -26,5 +20,11 @@ router.get("/as-seller", transaksiController.getTransaksiAsSeller);
 
 // Get transaction history
 router.get("/history", transaksiController.getTransaksiHistory);
+
+// Get transaction by ID
+router.get("/:id", transaksiController.getTransaksiById);
+
+// Update transaction status
+router.patch("/:id/status", transaksiController.updateTransaksiStatus);
 
 module.exports = router;
