@@ -16,7 +16,7 @@ router.put("/change-password", authenticate, userController.changePassword);
 router.put(
   "/update-profile-picture",
   authenticate,
-  upload.single("foto_profil"),
+  upload.single("profile_picture"),
   userController.updateProfilePicture
 );
 

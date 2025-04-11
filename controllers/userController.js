@@ -332,13 +332,13 @@ const updateProfilePicture = async (req, res, next) => {
     const result = await uploadFile(fileData, req.file.originalname);
 
     // Update profile picture with the URL from PocketBase
-    await user.update({ foto_profil: result.url });
+    await user.update({ profile_picture: result.url });
 
     res.status(200).json({
       success: true,
       message: "Profile picture updated successfully",
       data: {
-        foto_profil: user.foto_profil,
+        profile_picture: user.profile_picture,
       },
     });
   } catch (error) {
