@@ -246,18 +246,32 @@ const updateBarang = async (req, res, next) => {
     }
 
     // Handle file updates if any
-    let fileUrls = product.foto_barang ? product.foto_barang.split(",") : [];
+    // Get existing photos as array (using the getter)
+    let fileUrls = product.foto || [];
 
     if (req.files && req.files.length > 0) {
-      // Upload new files
-      const uploadPromises = req.files.map(async (file) => {
-        const result = await uploadFile(file.buffer, file.originalname);
-        return result.url;
-      });
-      const newFileUrls = await Promise.all(uploadPromises);
+      console.log(`Memproses ${req.files.length} file baru untuk diupload`);
 
-      // Combine with existing URLs
-      fileUrls = [...fileUrls, ...newFileUrls];
+      try {
+        // Upload new files
+        for (const file of req.files) {
+          try {
+            console.log(`Mengupload file: ${file.originalname}`);
+            const result = await uploadFile(file.buffer, file.originalname);
+            if (result && result.url) {
+              fileUrls.push(result.url);
+              console.log(`Berhasil upload file: ${result.url}`);
+            }
+          } catch (uploadError) {
+            console.error(
+              `Error uploading file ${file.originalname}:`,
+              uploadError
+            );
+          }
+        }
+      } catch (filesError) {
+        console.error("Error saat memproses files:", filesError);
+      }
     }
 
     // Update product
@@ -265,7 +279,7 @@ const updateBarang = async (req, res, next) => {
       kategori_id: kategori_id || product.kategori_id,
       judul: judul || product.judul,
       deskripsi: deskripsi || product.deskripsi,
-      foto_barang: fileUrls.join(","),
+      foto: fileUrls, // Use the setter which will JSON.stringify the array
       harga: harga || product.harga,
       lokasi: lokasi || product.lokasi,
       kondisi: kondisi || product.kondisi,
@@ -345,9 +359,8 @@ const hardDeleteBarang = async (req, res, next) => {
     }
 
     // Delete associated files from PocketBase
-    if (product.foto_barang) {
-      const fileIds = product.foto_barang.split(",");
-      const deletePromises = fileIds.map((fileId) => deleteFile(fileId));
+    if (product.foto && product.foto.length > 0) {
+      const deletePromises = product.foto.map((fileUrl) => deleteFile(fileUrl));
       await Promise.all(deletePromises);
     }
 
