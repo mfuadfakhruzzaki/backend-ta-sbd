@@ -6,9 +6,7 @@ const compression = require("compression");
 const path = require("path");
 const { sequelize } = require("./config/database");
 const { errorHandler } = require("./middleware/errorHandler");
-const { authLimiter, apiLimiter } = require("./middleware/rateLimiter");
 const corsMiddleware = require("./middleware/cors");
-const rateLimit = require("express-rate-limit");
 
 // Import routes
 const userRoute = require("./routes/userRoute");
@@ -24,18 +22,10 @@ const laporanRoute = require("./routes/laporanRoute");
 // Initialize Express app
 const app = express();
 
-// Trust proxy for rate limiter
-app.set("trust proxy", 1);
-
 // Security middleware
 app.use(helmet());
 app.use(corsMiddleware);
 app.use(compression());
-
-// Rate limiting
-app.use("/api/users/login", authLimiter);
-app.use("/api/users/register", authLimiter);
-app.use("/api/", apiLimiter);
 
 // Logging middleware
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
@@ -70,7 +60,7 @@ app.get("/health", (req, res) => {
 // Root route
 app.get("/", (req, res) => {
   res.json({
-    message: "Welcome to E-Commerce Barang Bekas API",
+    message: "Welcome PernahPunya API",
     version: "1.0.0",
     environment: process.env.NODE_ENV,
     domain: req.hostname,
